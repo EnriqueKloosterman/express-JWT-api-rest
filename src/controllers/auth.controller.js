@@ -34,8 +34,8 @@ export const login = async (req, res) =>{
                 message: 'El usuario no existe'
             });        
         }
-        const passwordIsValid = bcryptjs.compareSync(password, user.password);
-        if (!passwordIsValid) {
+        const passwordHashed = bcryptjs.compareSync(password, user.password);
+        if (!passwordHashed) {
             return res.status(401).json({
                 message: 'Contraseña incorrecta'
             });        
@@ -68,7 +68,7 @@ export const getAllUsers = async (req, res) => {
 
 export const getUser = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
+        const user = await User.findById(req.uid).lean();
         if (!user) {
             return res.status(404).json({ error: 'user not found' });
         }
