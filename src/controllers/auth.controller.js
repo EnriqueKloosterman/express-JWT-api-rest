@@ -1,6 +1,7 @@
 import { User } from '../database/models/User.js'
 import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { generateToken } from '../utils/tokenManager.js';
 
 export const register = async (req, res) => {
     const email = req.body.email;
@@ -40,11 +41,40 @@ export const login = async (req, res) =>{
             });        
         }
 
-        const token = jwt.sign({ uid: user.id }, process.env.JWT_SECRET) 
+        const { token, expiresIn } = generateToken(user.id); 
 
-        return res.status(200).json({ token })
+        return res.status(200).json({ token, expiresIn })
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: 'server error' })
+    }
+};
+
+export const getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find();
+        const user = users.map(user => {
+            return {
+                name: user.name,
+                email: user.email
+            }
+        });
+        return res.status(200).json({user});
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: 'server error' });
+    }
+};
+
+export const getUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ error: 'user not found' });
+        }
+        const { name, email } = user;
+        return res.status(200).json({name, email});
+    } catch (error) {
+        return res.status(500).json({ error: 'server error' });
     }
 }
