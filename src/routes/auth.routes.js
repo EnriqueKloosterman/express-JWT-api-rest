@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getAllUsers, getUser, login, register } from "../controllers/auth.controller.js";
+import { getAllUsers, getUser, login, logout, register } from "../controllers/auth.controller.js";
 import { validationResults, registerValiation, loginValidation } from "../middlewares/validationsResults.js";
 import { requireToken } from "../middlewares/authRequired.js";
 
@@ -9,5 +9,6 @@ router.post('/login', loginValidation, validationResults, login);
 router.post('/register', registerValiation, validationResults, register )
 router.get('/users', requireToken, getAllUsers );
 router.get('/profile', requireToken, getUser );
+router.get('/logout', logout)
 
 export default router;

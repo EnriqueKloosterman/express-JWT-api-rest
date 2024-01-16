@@ -55,6 +55,17 @@ export const login = async (req, res) =>{
     }
 };
 
+export const logout = async (req, res) => {
+    try {
+        res.clearCookie('token');
+        return res.status(200).json({ ok: true });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: 'server error' });
+    }
+
+}
+
 export const getAllUsers = async (req, res) => {
     try {
         const users = await User.find();
