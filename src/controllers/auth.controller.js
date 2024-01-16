@@ -31,17 +31,22 @@ export const login = async (req, res) =>{
         const user = await User.findOne({ email: email });
         if (!user) {
             return res.status(404).json({
-                message: 'El usuario no existe'
+                error: 'El usuario no existe'
             });        
         }
         const passwordHashed = bcryptjs.compareSync(password, user.password);
         if (!passwordHashed) {
             return res.status(401).json({
-                message: 'Contraseña incorrecta'
+                error: 'Contraseña incorrecta'
             });        
         }
 
         const { token, expiresIn } = generateToken(user.id); 
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: !(process.env.MODO === 'developer'),
+        })
 
         return res.status(200).json({ token, expiresIn })
     } catch (error) {
