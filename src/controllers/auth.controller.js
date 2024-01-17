@@ -1,6 +1,5 @@
 import { User } from '../database/models/User.js'
 import bcryptjs from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { generateToken } from '../utils/tokenManager.js';
 
 export const register = async (req, res) => {
@@ -93,4 +92,23 @@ export const getUser = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ error: 'server error' });
     }
-}
+};
+
+export const updateUser = async (req, res) => { 
+    try {
+        const user = await User.findById(req.uid).lean();
+        if (!user) {
+            return res.status(404).json({ error: 'user not found' });
+        }
+        const { name, email } = user;
+        await User.findByIdAndUpdate(
+            { _id: req.uid },
+            {$set: req.body},
+            {new: true}            
+            );
+
+        return res.status(200).json({ message: 'user updated' });
+    } catch (error) {
+        return res.status(500).json({ error: 'server error' });
+    }
+};
